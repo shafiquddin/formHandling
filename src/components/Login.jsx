@@ -2,17 +2,24 @@ import { useRef } from "react";
 import { useState } from "react";
 
 export default function Login() {
-const emailRef = useRef();
-const passwordRef = useRef(); 
-  // const [enteredValue,setEnteredValue] = useState({
-  //   email:'',
-  //   password:''
-  // })
+// const emailRef = useRef();
+// const passwordRef = useRef(); 
+  const [enteredValue,setEnteredValue] = useState({
+    email:'',
+    password:''
+  })
+
+  const [didEdit,setDidEdit] = useState({
+    email:false,
+    password:false,
+  })
+
+  const emailIsValid = didEdit.email && !enteredValue.email.includes("@");
+ 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const enteredEmail = emailRef.current.value;
-    const enteredPassword = passwordRef.current.value;
-    console.log(enteredEmail,enteredPassword)
+    console.log(enteredValue);
+    event.target.reset();
   }
 
   //If you dont want to pass identifier
@@ -26,15 +33,29 @@ const passwordRef = useRef();
 
   
   // using identifier passing
-  // const inputChangeHandler = (identifier,value) => {
-  //   setEnteredValue(preState => {
-  //     return {
-  //       ...preState,
-  //       [identifier]:value
-  //     }
-  //   })
-  // }
+  const inputChangeHandler = (identifier,value) => {
+    setEnteredValue(preState => {
+      return {
+        ...preState,
+        [identifier]:value
+      }
+    });
+    setDidEdit(preState=>{
+      return {
+        ...preState,
+        [identifier]:false
+      }
+    })
+  }
   
+  const handleBlur = (identifier) => {
+    setDidEdit(preState=>{
+      return {
+        ...preState,
+        [identifier]:true
+      }
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -44,16 +65,18 @@ const passwordRef = useRef();
         <div className="control no-margin">
           <label htmlFor="email">Email</label>
           {/* using no identifier <input id="email" onChange={inputChangeHandler} value={enteredValue.email} type="email" name="email" /> */}
-          {/* <input id="email" onChange={(event)=>inputChangeHandler('email',event.target.value)} value={enteredValue.email} type="email" name="email" /> */}
-          <input id="email" ref={emailRef} type="email" name="email" />
-
+          <input id="email" onChange={(event)=>inputChangeHandler('email',event.target.value)} onBlur={()=>handleBlur('email')} value={enteredValue.email} type="email" name="email" />
+          {/* <input id="email" ref={emailRef} type="email" name="email" /> */}
+          <div className="control-error">
+            {emailIsValid && <p>email is invalid please enter valid email</p>}
+          </div>
         </div>
 
         <div className="control no-margin">
           <label htmlFor="password">Password</label>
           {/* using no identifier <input id="password" onChange={inputChangeHandler} value={enteredValue.password} type="password" name="password" /> */}
-          {/* <input id="password" onChange={(event)=>inputChangeHandler('password',event.target.value)} value={enteredValue.password} type="password" name="password" /> */}
-          <input id="password" ref={passwordRef} type="password" name="password" />
+          <input id="password" onChange={(event)=>inputChangeHandler('password',event.target.value)} value={enteredValue.password} type="password" name="password" />
+          {/* <input id="password" ref={passwordRef} type="password" name="password" /> */}
         </div>
       </div>
 
