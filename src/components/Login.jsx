@@ -2,59 +2,43 @@ import { useRef } from "react";
 import { useState } from "react";
 
 export default function Login() {
-// const emailRef = useRef();
-// const passwordRef = useRef(); 
-  const [enteredValue,setEnteredValue] = useState({
-    email:'',
-    password:''
+  const [formIsInvalid, setFormIsInvalid] = useState({
+    email: false,
+    password: false
   })
+  const emailRef = useRef();
+  const passwordRef = useRef();
 
-  const [didEdit,setDidEdit] = useState({
-    email:false,
-    password:false,
-  })
-
-  const emailIsValid = didEdit.email && !enteredValue.email.includes("@");
- 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(enteredValue);
+
+    const enteredEmail = emailRef.current.value;
+    const enteredpassword = passwordRef.current.value;
+
+    const emailIsValid = enteredEmail.includes('@');
+    const passwordIsValid = enteredpassword.length < 3
+
+    if (!emailIsValid) {
+      setFormIsInvalid(preState => {
+        return {
+          ...preState,
+          email: true
+        }
+      })
+      return;
+    } 
+    
+    if(!passwordIsValid){
+      setFormIsInvalid(preState => {
+        return {
+          ...preState,
+          password: true
+        }
+      })
+      return;
+    }
+    setFormIsInvalid({email:false,password:false})
     event.target.reset();
-  }
-
-  //If you dont want to pass identifier
-  // const inputChangeHandler = (e) => {
-  //   const {name,value} = e.target;
-  //   setEnteredValue(preState=>{
-  //   return {  ...preState,[name]:value}
-  //   })
-  // }
-
-
-  
-  // using identifier passing
-  const inputChangeHandler = (identifier,value) => {
-    setEnteredValue(preState => {
-      return {
-        ...preState,
-        [identifier]:value
-      }
-    });
-    setDidEdit(preState=>{
-      return {
-        ...preState,
-        [identifier]:false
-      }
-    })
-  }
-  
-  const handleBlur = (identifier) => {
-    setDidEdit(preState=>{
-      return {
-        ...preState,
-        [identifier]:true
-      }
-    })
   }
 
   return (
@@ -64,20 +48,20 @@ export default function Login() {
       <div className="control-row">
         <div className="control no-margin">
           <label htmlFor="email">Email</label>
-          {/* using no identifier <input id="email" onChange={inputChangeHandler} value={enteredValue.email} type="email" name="email" /> */}
-          <input id="email" onChange={(event)=>inputChangeHandler('email',event.target.value)} onBlur={()=>handleBlur('email')} value={enteredValue.email} type="email" name="email" />
-          {/* <input id="email" ref={emailRef} type="email" name="email" /> */}
+          <input id="email" ref={emailRef} type="email" name="email" />
           <div className="control-error">
-            {emailIsValid && <p>email is invalid please enter valid email</p>}
+            {formIsInvalid.email && <p>email is invalid please enter valid email</p>}
           </div>
         </div>
 
         <div className="control no-margin">
           <label htmlFor="password">Password</label>
-          {/* using no identifier <input id="password" onChange={inputChangeHandler} value={enteredValue.password} type="password" name="password" /> */}
-          <input id="password" onChange={(event)=>inputChangeHandler('password',event.target.value)} value={enteredValue.password} type="password" name="password" />
-          {/* <input id="password" ref={passwordRef} type="password" name="password" /> */}
+          <input id="password" ref={passwordRef} type="password" name="password" />
+          <div className="control-error">
+            {formIsInvalid.password && <p>password is invalid please enter valid password</p>}
+          </div>
         </div>
+        
       </div>
 
       <p className="form-actions">
