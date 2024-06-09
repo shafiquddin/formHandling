@@ -1,59 +1,48 @@
-import { useRef } from "react";
 import { useState } from "react";
 
-export default function Login() {
-    const [enteredValue, setEnteredValue] = useState({
+export default function StateLogin() {
+    const [inputInvalid, setInputInvalid] = useState({
+        email: false,
+        password: false
+    });
+
+    const [inputForm, setInputForm] = useState({
         email: '',
         password: ''
-    })
+    });
 
-    const [didEdit, setDidEdit] = useState({
-        email: false,
-        password: false,
-    })
+    const onInputChangeHandler = (identifier, value) => {
+        setInputForm(preState => ({
+            ...preState,
+            [identifier]: value
+        }));
+        setInputInvalid(preState => ({
+            ...preState,
+            [identifier]: false
+        }));
+    };
 
-    const emailIsValid = didEdit.email && !enteredValue.email.includes("@");
+    const onBlurHandler = (identifier) => {
+        setInputInvalid(preState => ({
+            ...preState,
+            [identifier]: true
+        }));
+    };
+
+    const emailIsValid = inputForm.email.includes('@');
+    const passwordIsValid = inputForm.password.length >= 4;
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(enteredValue);
-        event.target.reset();
-    }
-
-    //If you dont want to pass identifier
-    // const inputChangeHandler = (e) => {
-    //   const {name,value} = e.target;
-    //   setEnteredValue(preState=>{
-    //   return {  ...preState,[name]:value}
-    //   })
-    // }
-
-
-
-    // using identifier passing
-    const inputChangeHandler = (identifier, value) => {
-        setEnteredValue(preState => {
-            return {
-                ...preState,
-                [identifier]: value
-            }
-        });
-        setDidEdit(preState => {
-            return {
-                ...preState,
-                [identifier]: false
-            }
-        })
-    }
-
-    const handleBlur = (identifier) => {
-        setDidEdit(preState => {
-            return {
-                ...preState,
-                [identifier]: true
-            }
-        })
-    }
+        if (!emailIsValid || !passwordIsValid) {
+            setInputInvalid({
+                email: !emailIsValid,
+                password: !passwordIsValid
+            });
+            return;
+        }
+        console.log(inputForm);
+    };
 
     return (
         <form onSubmit={handleSubmit}>
@@ -62,23 +51,38 @@ export default function Login() {
             <div className="control-row">
                 <div className="control no-margin">
                     <label htmlFor="email">Email</label>
-                    {/* using no identifier <input id="email" onChange={inputChangeHandler} value={enteredValue.email} type="email" name="email" /> */}
-                    <input id="email" onChange={(event) => inputChangeHandler('email', event.target.value)} onBlur={() => handleBlur('email')} value={enteredValue.email} type="email" name="email" />
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={inputForm.email}
+                        onBlur={() => onBlurHandler('email')}
+                        onChange={(event) => onInputChangeHandler('email', event.target.value)}
+                    />
                     <div className="control-error">
-                        {emailIsValid && <p>email is invalid please enter valid email</p>}
+                        {inputInvalid.email && !emailIsValid && <p>Please enter a valid email</p>}
                     </div>
                 </div>
 
                 <div className="control no-margin">
                     <label htmlFor="password">Password</label>
-                    {/* using no identifier <input id="password" onChange={inputChangeHandler} value={enteredValue.password} type="password" name="password" /> */}
-                    <input id="password" onChange={(event) => inputChangeHandler('password', event.target.value)} value={enteredValue.password} type="password" name="password" />
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        value={inputForm.password}
+                        onBlur={() => onBlurHandler('password')}
+                        onChange={(event) => onInputChangeHandler('password', event.target.value)}
+                    />
+                    <div className="control-error">
+                        {inputInvalid.password && !passwordIsValid && <p>Please enter a valid password</p>}
+                    </div>
                 </div>
             </div>
 
             <p className="form-actions">
-                <button className="button button-flat">Reset</button>
-                <button className="button">Login</button>
+                <button type="button" className="button button-flat" onClick={() => setInputForm({ email: '', password: '' })}>Reset</button>
+                <button type="submit" className="button">Login</button>
             </p>
         </form>
     );
