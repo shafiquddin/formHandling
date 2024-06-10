@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Input from "./Input";
-import { isEmail,isNotEmpty,hasMinLength } from '../util/validation.js'
+import { isEmail, isNotEmpty, hasMinLength } from '../util/validation.js'
 
 export default function StateLogin() {
     const [inputInvalid, setInputInvalid] = useState({
@@ -14,32 +14,35 @@ export default function StateLogin() {
     });
 
     const onInputChangeHandler = (identifier, value) => {
-        setInputForm(preState => ({
-            ...preState,
+        setInputForm(prevState => ({
+            ...prevState,
             [identifier]: value
         }));
-        setInputInvalid(preState => ({
-            ...preState,
+        setInputInvalid(prevState => ({
+            ...prevState,
             [identifier]: false
         }));
     };
 
     const onBlurHandler = (identifier) => {
-        setInputInvalid(preState => ({
-            ...preState,
+        setInputInvalid(prevState => ({
+            ...prevState,
             [identifier]: true
         }));
     };
 
-    const emailIsValid = inputInvalid.email && !isEmail(inputForm.email) && !isNotEmpty(inputForm.password)
-    const passwordIsValid =inputInvalid.password && !isNotEmpty(inputForm.password) && !hasMinLength(inputForm.password);
+    const emailIsValid = inputInvalid.email && (!isEmail(inputForm.email) || !isNotEmpty(inputForm.email));
+    const passwordIsValid = inputInvalid.password && !hasMinLength(inputForm.password, 6);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (emailIsValid || passwordIsValid) {
+        const emailIsInvalid = !isEmail(inputForm.email) || !isNotEmpty(inputForm.email);
+        const passwordIsInvalid = !hasMinLength(inputForm.password, 6);
+
+        if (emailIsInvalid || passwordIsInvalid) {
             setInputInvalid({
-                email: emailIsValid,
-                password: passwordIsValid
+                email: emailIsInvalid,
+                password: passwordIsInvalid
             });
             return;
         }
@@ -58,11 +61,14 @@ export default function StateLogin() {
                 <Input label="Password" type="password" name="password" id="password" value={inputForm.password}
                     onBlur={() => onBlurHandler('password')}
                     onChange={(event) => onInputChangeHandler('password', event.target.value)}
-                    error={passwordIsValid && 'Please enter a valid Password'} />
+                    error={passwordIsValid && 'Please enter a valid password'} />
             </div>
 
             <p className="form-actions">
-                <button type="button" className="button button-flat" onClick={() => setInputForm({ email: '', password: '' })}>Reset</button>
+                <button type="button" className="button button-flat" onClick={() => {
+                    setInputForm({ email: '', password: '' });
+                    setInputInvalid({ email: false, password: false });
+                }}>Reset</button>
                 <button type="submit" className="button">Login</button>
             </p>
         </form>
