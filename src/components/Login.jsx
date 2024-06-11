@@ -1,4 +1,5 @@
 import useInput from "../hooks/useInput";
+import Input from "./Input";
 import { hasMinLength, isEmail, isNotEmpty } from "../util/validation";
 
 export default function Login() {
@@ -18,22 +19,8 @@ const {value:passwordValue , onBlurHandler:onPasswordBlurHandler,onInputChangeHa
       <h2>Login</h2>
 
       <div className="control-row">
-        <div className="control no-margin">
-          <label htmlFor="email">Email</label>
-          <input id="email" value={emailValue} onChange={onEmailChangeHandler} onBlur={onEmailBlurHandler} type="email" name="email" />
-          <div className="control-error">
-            {emailValid && <p>email is invalid please enter valid email</p>}
-          </div>
-        </div>
-
-        <div className="control no-margin">
-          <label htmlFor="password">Password</label>
-          <input id="password" value={passwordValue} onChange={onPasswordChangeHandler} onBlur={onPasswordBlurHandler}  type="password" name="password" />
-          <div className="control-error">
-            {passwordValid && <p>password is invalid please enter valid password</p>}
-          </div>
-        </div>
-        
+          <Input id="email" value={emailValue} onChange={onEmailChangeHandler} onBlur={onEmailBlurHandler} type="email" name="email" error={emailValid && 'please enter valid email'} />
+          <Input id="password" value={passwordValue} onChange={onPasswordChangeHandler} onBlur={onPasswordBlurHandler}  type="password" name="password" error ={passwordValid && 'please enter valid password'} />       
       </div>
 
       <p className="form-actions">
